@@ -329,7 +329,7 @@ def ogre_document(materials):
     else:
         scn.setAttribute('previous_export_time', '0')
     bscn[ '_previous_export_time_' ] = now
-    scn.setAttribute('exported_by', getpass.getuser())
+    scn.setAttribute('author', getpass.getuser())
 
     nodes = doc.createElement('nodes')
     doc._scene_nodes = nodes
@@ -350,13 +350,10 @@ def ogre_document(materials):
     # Environ settings
     world = bpy.context.scene.world
     if world: # multiple scenes - other scenes may not have a world
-        _c = { 'colourAmbient': world.ambient_color,
-               'colourBackground': world.horizon_color,
-               'colourDiffuse': world.horizon_color,
-             }
-        for ctag in _c:
+        _c = [ ('colourAmbient', world.ambient_color),
+               ('colourBackground', world.horizon_color)]
+        for ctag, color in _c:
             a = doc.createElement(ctag); environ.appendChild( a )
-            color = _c[ctag]
             a.setAttribute('r', '%s'%color.r)
             a.setAttribute('g', '%s'%color.g)
             a.setAttribute('b', '%s'%color.b)
@@ -371,9 +368,11 @@ def ogre_document(materials):
         #a.setAttribute('mode', world.mist_settings.falloff.lower() )    # not on DTD spec
         a.setAttribute('linearEnd', '%s' %(world.mist_settings.start+world.mist_settings.depth))
         a.setAttribute('expDensity', world.mist_settings.intensity)
-        a.setAttribute('colourR', world.horizon_color.r)
-        a.setAttribute('colourG', world.horizon_color.g)
-        a.setAttribute('colourB', world.horizon_color.b)
+        
+        c = doc.createElement('colourDiffuse'); a.appendChild( c )
+        c.setAttribute('r', '%s'%color.r)
+        c.setAttribute('g', '%s'%color.g)
+        c.setAttribute('b', '%s'%color.b)
 
     return doc
 
@@ -405,16 +404,17 @@ def dot_scene_node_export( ob, path, doc=None, rex=None,
     # -- end of Mind Calamity patch
 
     # BGE subset
-    game = doc.createElement('game')
-    o.appendChild( game )
-    sens = doc.createElement('sensors')
-    game.appendChild( sens )
-    acts = doc.createElement('actuators')
-    game.appendChild( acts )
-    for sen in ob.game.sensors:
-        sens.appendChild( WrapSensor(sen).xml(doc) )
-    for act in ob.game.actuators:
-        acts.appendChild( WrapActuator(act).xml(doc) )
+    if len(ob.game.sensors) + len(ob.game.actuators) > 0:
+        game = doc.createElement('game')
+        o.appendChild( game )
+        sens = doc.createElement('sensors')
+        game.appendChild( sens )
+        acts = doc.createElement('actuators')
+        game.appendChild( acts )
+        for sen in ob.game.sensors:
+            sens.appendChild( WrapSensor(sen).xml(doc) )
+        for act in ob.game.actuators:
+            acts.appendChild( WrapActuator(act).xml(doc) )
 
     if ob.type == 'MESH':
         # ob.data.tessfaces is empty. always until the following call
@@ -515,8 +515,6 @@ def dot_scene_node_export( ob, path, doc=None, rex=None,
             c.setAttribute('projectionType', "orthographic")
             c.setAttribute('orthoScale', '%s'%ob.data.ortho_scale)
         a = doc.createElement('clipping'); c.appendChild( a )
-        a.setAttribute('nearPlaneDist', '%s' %ob.data.clip_start)
-        a.setAttribute('farPlaneDist', '%s' %ob.data.clip_end)
         a.setAttribute('near', '%s' %ob.data.clip_start)    # requested by cyrfer
         a.setAttribute('far', '%s' %ob.data.clip_end)
 
@@ -544,31 +542,13 @@ def dot_scene_node_export( ob, path, doc=None, rex=None,
         l.setAttribute('name', ob.name )
         l.setAttribute('powerScale', str(ob.data.energy))
 
-        a = doc.createElement('lightAttenuation'); l.appendChild( a )
-        a.setAttribute('range', '5000' )            # is this an Ogre constant?
-        a.setAttribute('constant', '1.0')        # TODO support quadratic light
-        a.setAttribute('linear', '%s'%(1.0/ob.data.distance))
-        a.setAttribute('quadratic', '0.0')
-
         if ob.data.type in ('SPOT', 'SUN'):
-            #-- 
-            rot_matrix = mathutils.Euler.to_matrix(ob.rotation_euler)
-            unswaped_vector = rot_matrix*mathutils.Vector((0,0,-1))
-            vector = swap(unswaped_vector)           
-            
-            a = doc.createElement('direction')
+            vector = swap(mathutils.Euler.to_matrix(ob.rotation_euler)[2])
+            a = doc.createElement('normal')
             l.appendChild(a)
-            
             a.setAttribute('x',str(round(vector[0],3)))
             a.setAttribute('y',str(round(vector[1],3)))
             a.setAttribute('z',str(round(vector[2],3)))
-
-        if ob.data.type == 'SPOT':
-            a = doc.createElement('spotLightRange')
-            l.appendChild(a)
-            a.setAttribute('inner',str( ob.data.spot_size*(1.0-ob.data.spot_blend) ))
-            a.setAttribute('outer',str(ob.data.spot_size))
-            a.setAttribute('falloff','1.0')
 
         if ob.data.use_diffuse:
             a = doc.createElement('colourDiffuse'); l.appendChild( a )
@@ -581,6 +561,19 @@ def dot_scene_node_export( ob, path, doc=None, rex=None,
             a.setAttribute('r', '%s'%ob.data.color.r)
             a.setAttribute('g', '%s'%ob.data.color.g)
             a.setAttribute('b', '%s'%ob.data.color.b)
+
+        if ob.data.type == 'SPOT':
+            a = doc.createElement('lightRange')
+            l.appendChild(a)
+            a.setAttribute('inner',str( ob.data.spot_size*(1.0-ob.data.spot_blend) ))
+            a.setAttribute('outer',str(ob.data.spot_size))
+            a.setAttribute('falloff','1.0')
+
+        a = doc.createElement('lightAttenuation'); l.appendChild( a )
+        a.setAttribute('range', '5000' )            # is this an Ogre constant?
+        a.setAttribute('constant', '1.0')        # TODO support quadratic light
+        a.setAttribute('linear', '%s'%(1.0/ob.data.distance))
+        a.setAttribute('quadratic', '0.0')
 
         if ob.data.type != 'HEMI':  # colourShadow is extra, not part of Ogre DTD
             if ob.data.shadow_method != 'NOSHADOW': # Hemi light has no shadow_method
