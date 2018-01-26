@@ -12,7 +12,7 @@ import logging
 from itertools import chain
 from .materialv2 import OgreMaterialGeneratorV2, OgreMaterialGeneratorBase
 
-def dot_materials(materials, path=None, separate_files=True):
+def dot_materials(materials, path=None, separate_files=True, prefix='mats', **kwargs):
     """
     generate material files, or copy them into a single file
 
@@ -30,6 +30,7 @@ def dot_materials(materials, path=None, separate_files=True):
         for mat in materials:
             dot_material(mat, path)
     else:
+        mat_file_name = prefix
         target_file = os.path.join(path, '%s.material' % mat_file_name)
         with open(target_file, 'wb') as fd:
             fd.write(bytes(MISSING_MATERIAL + "\n",'utf-8'))
