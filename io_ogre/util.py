@@ -17,8 +17,11 @@ def xml_converter_parameters():
     Return the name of the ogre converter
     """
     exe = config.get('OGRETOOLS_XML_CONVERTER')
-    proc = subprocess.Popen([exe,'-v'],stdout=subprocess.PIPE)
-    output, _ = proc.communicate()
+    try:
+        proc = subprocess.Popen([exe,'-v'],stdout=subprocess.PIPE)
+        output, _ = proc.communicate()
+    except FileNotFoundError as e:
+        raise Exception("File %s not found"%exe)
 
     pattern = re.compile("OgreXMLConverter ([^ ]+) \((\d+)\.(\d+).(\d+)\) ([^ ]+)")
 
