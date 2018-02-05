@@ -6,7 +6,8 @@
 ## Installing ##
  * Copy the [io_ogre](io_ogre) folder into the [$BLENDER_DIR](https://docs.blender.org/manual/ja/dev/getting_started/installing/configuration/directories.html)`/scripts/addons` folder.
  * After installing the addon enable it in Blender from `User Preferences > Add-Ons > Import-Export`. Search for `ogre` and check the box on the right. 
- * Setup tools path at least for OGRETOOLS_XML_CONVERTER and OGRE_MESH_TOOL. See the screen shot:
+ * Setup tools path at least for OGRETOOLS_XML_CONVERTER and OGRE_MESH_TOOL. See the screenshot:
+![screenshot](https://raw.githubusercontent.com/screwt/blender2ogre/master/doc/media/settings.png)
 
 Remember to save as default if you want the addon to be enabled after you exit your Blender.  
 Integrated help docs will be shown in the upper right hand toolbar, replacing blender's normal `Help` menu, read them for assistance.
