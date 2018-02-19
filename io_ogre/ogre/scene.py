@@ -19,6 +19,7 @@ def dot_scene(path, scene_name=None):
     path: string - target path to save the scene file and related files to
     scene_name: string optional - the name of the scene file, defaults to the scene name of blender
     """
+
     if not scene_name:
         scene_name = bpy.context.scene.name
     scene_file = scene_name + '.scene'
@@ -297,9 +298,13 @@ def _ogre_node_helper( doc, ob, prefix='', pos=None, rot=None, scl=None ):
     p.setAttribute('z', '%6f'%v.z)
 
     if rot:
+        logger.info("#####   scene.py ROT %s"%ob.name)
         v = swap(rot)
     else:
+        
         v = swap( mat.to_quaternion() )
+        logger.info("#####   scene.py NO ROT %s\n    %s\n   %s"%(ob.name,v, mat))
+        
     q.setAttribute('qx', '%6f'%v.x)
     q.setAttribute('qy', '%6f'%v.y)
     q.setAttribute('qz', '%6f'%v.z)
