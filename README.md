@@ -4,13 +4,19 @@
 * [Ogre forum thread](http://ogre3d.org/forums/viewtopic.php?f=8&t=61485)
 
 ## Installing ##
-Copy the [io_ogre](io_ogre) folder into the [$BLENDER_DIR](https://docs.blender.org/manual/ja/dev/getting_started/installing/configuration/directories.html)`/scripts/addons` folder.
-Note on Windows: you have to set the correct path to `OGRETOOLS_XML_CONVERTER` in [io_ogre/config.py](io_ogre/config.py) prior to the first run.  
-After installing the addon enable it in Blender from `User Preferences > Add-Ons > Import-Export`. Search for `ogre` and check the box on the right. Remember to save as default if you want the addon to be enabled after you exit your Blender.  
+ * Copy the [io_ogre](io_ogre) folder into the [$BLENDER_DIR](https://docs.blender.org/manual/ja/dev/getting_started/installing/configuration/directories.html)`/scripts/addons` folder.
+ * After installing the addon enable it in Blender from `User Preferences > Add-Ons > Import-Export`. Search for `ogre` and check the box on the right. 
+ * Setup tools path at least for OGRETOOLS_XML_CONVERTER and OGRE_MESH_TOOL. See the screenshot:
+![screenshot](https://raw.githubusercontent.com/screwt/blender2ogre/master/doc/media/settings.png)
+
+Remember to save as default if you want the addon to be enabled after you exit your Blender.  
 Integrated help docs will be shown in the upper right hand toolbar, replacing blender's normal `Help` menu, read them for assistance.
 
 The following versions of blender have been tested. It might also work with older versions of Blender.
 
+
+
+* Blender 2.79
 * Blender 2.75
 * Blender 2.71
 * Blender 2.66
@@ -133,7 +139,8 @@ It has been well tested on linux 64-bit and should work with others.
 ## Authors ##
 
 This Blender addon was made possible by the following list of people. Anyone can contribute to the project by sending bug reports and feature requests [here](https://bitbucket.org/plan_rich/blender2ogre/issues). Naturally the most welcome contribution is actual code via [pull requests](https://bitbucket.org/plan_rich/blender2ogre/pull-requests). If you are planning to implement something "big", it's a good practise to discuss it in the issue tracker first with other authors. So that there is no overlap with other developers or the overall roadmap.
- 
+
+  
 * [Brett](http://pyppet.blogspot.fi/)
 * S. Rombauts
 * F00bar
@@ -144,6 +151,7 @@ This Blender addon was made possible by the following list of people. Anyone can
 * vax456
 * Sybren Stüvel
 * [Richard Plangger](https://bitbucket.org/plan_rich)
+* Screwt (https://github.com/screwt)
 
 Additionally the following companies have supported/sponsored the development efforts.
 
